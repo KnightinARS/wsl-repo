@@ -1,0 +1,136 @@
+To create a manifest V3 Chrome extension that functions as a task manager with checkable tasks, follow these steps:
+
+1. Create a new directory for your extension and navigate to it in your terminal or command prompt.
+
+2. Create a new file called `manifest.json` and add the following content:
+
+```json
+{
+  "manifest_version": 3,
+  "name": "Task Manager",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
+```
+
+3. Create a new file called `popup.html` and add the following content:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Manager</title>
+  <style>
+    body {
+      width: 400px;
+      min-height: 600px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .task {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .task input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .task label {
+      flex-grow: 1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Task Manager</h1>
+  <div id="taskList"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
+```
+
+4. Create a new file called `popup.js` and add the following content:
+
+```javascript
+document.addEventListener("DOMContentLoaded", function() {
+  const taskList = document.getElementById("taskList");
+
+  // Load tasks from storage or initialize an empty array
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  // Function to render the task list
+  function renderTasks() {
+    taskList.innerHTML = "";
+
+    tasks.forEach(function(task, index) {
+      const taskElement = document.createElement("div");
+      taskElement.className = "task";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = task.completed;
+      checkbox.addEventListener("change", function() {
+        tasks[index].completed = this.checked;
+        saveTasks();
+      });
+
+      const label = document.createElement("label");
+      label.textContent = task.text;
+
+      taskElement.appendChild(checkbox);
+      taskElement.appendChild(label);
+
+      taskList.appendChild(taskElement);
+    });
+  }
+
+  // Function to save tasks to storage
+  function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    renderTasks();
+  }
+
+  // Function to handle form submission
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const input = document.getElementById("taskInput");
+    const taskText = input.value.trim();
+
+    if (taskText !== "") {
+      const newTask = {
+        text: taskText,
+        completed: false
+      };
+      tasks.push(newTask);
+      saveTasks();
+      input.value = "";
+    }
+  }
+
+  // Add event listener for form submission
+  const form = document.getElementById("taskForm");
+  form.addEventListener("submit", handleFormSubmit);
+
+  // Initial rendering of tasks
+  renderTasks();
+});
+```
+
+5. Add the necessary image files (icon16.png, icon48.png, icon128.png) in the same directory.
+
+6. Load the extension in Chrome:
+   - Open Chrome and go to `chrome://extensions`.
+   - Enable the "Developer mode" toggle on the top right corner.
+   - Click on "Load unpacked" and select the directory where you created your extension.
+
+Now, when you click
+
+ on the extension's icon, it will open a popup window with a task manager interface. You can enter tasks in the input field, and each task will be displayed with a checkbox next to it. You can mark a task as completed by checking its checkbox. The task list will be saved in the browser's local storage, so the tasks will persist even if you close and reopen the extension.
+
+The popup window has a minimum height of 600px and a width of 400px, as specified.
